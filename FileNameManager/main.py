@@ -1,4 +1,4 @@
-import tkinter as tk
+ï»¿import tkinter as tk
 from tkinter import filedialog
 import os
 import subprocess
@@ -8,22 +8,22 @@ def remove_files():
     if word_to_remove:
         folder_path = filedialog.askdirectory()
         if folder_path:
-            # Æú´õ ³»ÀÇ ¸ğµç ÆÄÀÏ °Ë»ö
+            # í´ë” ë‚´ì˜ ëª¨ë“  íŒŒì¼ ê²€ìƒ‰
             for root, dirs, files in os.walk(folder_path):
                 for file in files:
                     file_path = os.path.join(root, file)
                     if file == word_to_remove:
                         os.remove(file_path)
             
-            # ÀÛ¾÷ ¿Ï·á ¾Ë¸² Ã¢ Ç¥½Ã
-            show_done_window("ÆÄÀÏ »èÁ¦ ¿Ï·á")
+            # ì‘ì—… ì™„ë£Œ ì•Œë¦¼ ì°½ í‘œì‹œ
+            show_done_window("íŒŒì¼ ì‚­ì œ ì™„ë£Œ")
 
 def remove_string_from_filename():
     word_to_remove = word_entry.get()
     if word_to_remove:
         folder_path = filedialog.askdirectory()
         if folder_path:
-            # Æú´õ ³»ÀÇ ¸ğµç ÆÄÀÏ °Ë»ö
+            # í´ë” ë‚´ì˜ ëª¨ë“  íŒŒì¼ ê²€ìƒ‰
             for root, dirs, files in os.walk(folder_path):
                 for file in files:
                     file_path = os.path.join(root, file)
@@ -32,18 +32,18 @@ def remove_string_from_filename():
                         new_file_path = os.path.join(root, new_file_name)
                         os.rename(file_path, new_file_path)
             
-            # ÀÛ¾÷ ¿Ï·á ¾Ë¸² Ã¢ Ç¥½Ã
-            show_done_window("ÆÄÀÏ¸í º¯°æ ¿Ï·á")
+            # ì‘ì—… ì™„ë£Œ ì•Œë¦¼ ì°½ í‘œì‹œ
+            show_done_window("íŒŒì¼ëª… ë³€ê²½ ì™„ë£Œ")
 
 def show_done_window(message):
     done_window = tk.Toplevel(root)
-    done_window.title("ÀÛ¾÷ ¿Ï·á")
+    done_window.title("ì‘ì—… ì™„ë£Œ")
     label = tk.Label(done_window, text=message)
     label.pack(padx=20, pady=20)
     done_window.mainloop()
     
 root = tk.Tk()
-root.title("ÆÄÀÏ °ü¸®±â")
+root.title("íŒŒì¼ ê´€ë¦¬ê¸°")
 
 window_width = 300
 window_height = 150
@@ -53,16 +53,16 @@ x_pos = (screen_width - window_width) // 2
 y_pos = (screen_height - window_height) // 2
 root.geometry(f"{window_width}x{window_height}+{x_pos}+{y_pos}")
 
-word_label = tk.Label(root, text="ÆÄÀÏ¸í ¶Ç´Â ´Ü¾î:")
+word_label = tk.Label(root, text="íŒŒì¼ëª… ë˜ëŠ” ë‹¨ì–´:")
 word_label.pack(pady=5)
 
 word_entry = tk.Entry(root)
 word_entry.pack(pady=5)
 
-remove_file_button = tk.Button(root, text="ÆÄÀÏ »èÁ¦", command=remove_files)
+remove_file_button = tk.Button(root, text="íŒŒì¼ ì‚­ì œ", command=remove_files)
 remove_file_button.pack(pady=10)
 
-remove_string_button = tk.Button(root, text="ÆÄÀÏ¸í¿¡¼­ ¹®ÀÚ Á¦°Å", command=remove_string_from_filename)
+remove_string_button = tk.Button(root, text="íŒŒì¼ëª…ì—ì„œ ë¬¸ì ì œê±°", command=remove_string_from_filename)
 remove_string_button.pack(pady=10)
 
 root.mainloop()
