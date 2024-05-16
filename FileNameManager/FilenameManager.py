@@ -40,6 +40,13 @@ class FilenameManager:
         if folder_path and word_to_change:
             # 폴더 내의 모든 파일 및 폴더 검색
             for root, dirs, files in os.walk(folder_path):
+                # 폴더명 변경
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    new_dir_name = dir.replace(word_to_remove, word_to_change)
+                    if new_dir_name != dir:
+                        new_dir_path = os.path.join(root, new_dir_name)
+                        os.rename(dir_path, new_dir_path)
              # 파일명 변경
                 for file in files:
                     file_path = os.path.join(root, file)
