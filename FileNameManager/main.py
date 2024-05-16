@@ -1,22 +1,18 @@
 ﻿import tkinter as tk
 from tkinter import filedialog
-import os
 import subprocess
+from FilenameManager import *
 
 def remove_files():
     word_to_remove = word_entry.get()
+
     if word_to_remove:
         folder_path = filedialog.askdirectory()
-        if folder_path:
-            # 폴더 내의 모든 파일 검색
-            for root, dirs, files in os.walk(folder_path):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    if file == word_to_remove:
-                        os.remove(file_path)
-            
-            # 작업 완료 알림 창 표시
-            show_done_window("파일 삭제 완료")
+
+        FilenameManager.remove_files(folder_path,word_to_remove)
+
+        # 작업 완료 알림 창 표시
+        show_done_window("파일 삭제 완료")
 
 def remove_string_from_filename():
     word_to_remove = word_entry.get()
@@ -24,27 +20,10 @@ def remove_string_from_filename():
     if word_to_remove:
         folder_path = filedialog.askdirectory()
 
-        if folder_path:
-            # 폴더 내의 모든 파일 및 폴더 검색
-            for root, dirs, files in os.walk(folder_path):
-                # 폴더명 변경
-                for dir in dirs:
-                    dir_path = os.path.join(root, dir)
-                    new_dir_name = dir.replace(word_to_remove, "")
-                    if new_dir_name != dir:
-                        new_dir_path = os.path.join(root, new_dir_name)
-                        os.rename(dir_path, new_dir_path)
+        FilenameManager.remove_string_from_filename(folder_path, word_to_remove)
 
-                # 파일명 변경
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    new_file_name = file.replace(word_to_remove, "")
-                    if new_file_name != file:
-                        new_file_path = os.path.join(root, new_file_name)
-                        os.rename(file_path, new_file_path)
-
-            # 작업 완료 알림 창 표시
-            show_done_window("파일명 및 폴더명 변경 완료")
+        # 작업 완료 알림 창 표시
+        show_done_window("파일명 및 폴더명 변경 완료")
 
 def show_done_window(message):
     done_window = tk.Toplevel(root)
