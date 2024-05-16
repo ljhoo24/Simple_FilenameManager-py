@@ -34,3 +34,16 @@ class FilenameManager:
                     if new_file_name != file:
                         new_file_path = os.path.join(root, new_file_name)
                         os.rename(file_path, new_file_path)
+
+    @staticmethod
+    def change_string_from_filename(folder_path, word_to_remove, word_to_change):
+        if folder_path and word_to_change:
+            # 폴더 내의 모든 파일 및 폴더 검색
+            for root, dirs, files in os.walk(folder_path):
+             # 파일명 변경
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    new_file_name = file.replace(word_to_remove, word_to_change)
+                    if new_file_name != file:
+                        new_file_path = os.path.join(root, new_file_name)
+                        os.rename(file_path, new_file_path)

@@ -4,7 +4,7 @@ import subprocess
 from FilenameManager import *
 
 def remove_files():
-    word_to_remove = word_entry.get()
+    word_to_remove = word_entry1.get()
 
     if word_to_remove:
         folder_path = filedialog.askdirectory()
@@ -15,12 +15,24 @@ def remove_files():
         show_done_window("파일 삭제 완료")
 
 def remove_string_from_filename():
-    word_to_remove = word_entry.get()
+    word_to_remove = word_entry1.get()
 
     if word_to_remove:
         folder_path = filedialog.askdirectory()
 
         FilenameManager.remove_string_from_filename(folder_path, word_to_remove)
+
+        # 작업 완료 알림 창 표시
+        show_done_window("파일명 및 폴더명 변경 완료")
+
+def change_string_from_filename():
+    word_to_remove = word_entry1.get()
+    word_to_change = word_entry2.get()
+
+    if word_to_remove:
+        folder_path = filedialog.askdirectory()
+
+        FilenameManager.change_string_from_filename(folder_path, word_to_remove, word_to_change)
 
         # 작업 완료 알림 창 표시
         show_done_window("파일명 및 폴더명 변경 완료")
@@ -36,23 +48,40 @@ root = tk.Tk()
 root.title("파일 관리기")
 
 window_width = 300
-window_height = 150
+window_height = 250
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 x_pos = (screen_width - window_width) // 2
 y_pos = (screen_height - window_height) // 2
 root.geometry(f"{window_width}x{window_height}+{x_pos}+{y_pos}")
 
-word_label = tk.Label(root, text="파일명 또는 단어:")
-word_label.pack(pady=5)
+# 그리드 행 구성
+for i in range(5):
+    root.grid_rowconfigure(i, weight=1, minsize=window_height//5)
 
-word_entry = tk.Entry(root)
-word_entry.pack(pady=5)
+# 그리드 열 구성
+for i in range(2):
+    root.grid_columnconfigure(i, weight=1, minsize=window_width//2)
+
+word_label1 = tk.Label(root, text="목표 단어 : ")
+word_label1.grid(row=0, column=0, pady=5, sticky="e")
+
+word_entry1 = tk.Entry(root)
+word_entry1.grid(row=0, column=1, pady=5, sticky="w")
+
+word_label2 = tk.Label(root, text="변경될 단어 : ")
+word_label2.grid(row=1, column=0, pady=5, sticky="e")
+
+word_entry2 = tk.Entry(root)
+word_entry2.grid(row=1, column=1, pady=5, sticky="w")
 
 remove_file_button = tk.Button(root, text="파일 삭제", command=remove_files)
-remove_file_button.pack(pady=10)
+remove_file_button.grid(row=2, column=0, columnspan=2, ipady=5)
 
 remove_string_button = tk.Button(root, text="파일명에서 문자 제거", command=remove_string_from_filename)
-remove_string_button.pack(pady=10)
+remove_string_button.grid(row=3, column=0, columnspan=2,ipady=5)
+
+change_string_button = tk.Button(root, text="파일명에서 문자 변경", command=change_string_from_filename)
+change_string_button.grid(row=4, column=0, columnspan=2, ipady=5)
 
 root.mainloop()
