@@ -54,3 +54,17 @@ class FilenameManager:
                     if new_file_name != file:
                         new_file_path = os.path.join(root, new_file_name)
                         os.rename(file_path, new_file_path)
+
+    @staticmethod
+    def rename_to_uppercase(folder_path):
+        for root, dirs, files in os.walk(folder_path, topdown=False):
+            # 파일명을 대문자로 변경
+            for name in files:
+                old_path = os.path.join(root, name)
+                new_path = os.path.join(root, name.upper())
+                os.rename(old_path, new_path)
+            # 폴더명을 대문자로 변경
+            for name in dirs:
+                old_path = os.path.join(root, name)
+                new_path = os.path.join(root, name.upper())
+                os.rename(old_path, new_path)

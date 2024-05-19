@@ -1,5 +1,6 @@
-﻿import tkinter as tk
-from tkinter import filedialog
+﻿from textwrap import fill
+import tkinter as tk
+from tkinter import Menubutton, filedialog
 import subprocess
 from FilenameManager import *
 
@@ -43,12 +44,20 @@ def show_done_window(message):
     label = tk.Label(done_window, text=message)
     label.pack(padx=20, pady=20)
     done_window.mainloop()
+
+def makeupper():
+    folder_path = filedialog.askdirectory()
+
+    FilenameManager.rename_to_uppercase(folder_path)
+
+    # 작업 완료 알림 창 표시
+    show_done_window("파일명 및 폴더명 변경 완료")
     
 root = tk.Tk()
 root.title("파일 관리기")
 
-window_width = 300
-window_height = 250
+window_width = 200
+window_height = 150
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 x_pos = (screen_width - window_width) // 2
@@ -56,8 +65,8 @@ y_pos = (screen_height - window_height) // 2
 root.geometry(f"{window_width}x{window_height}+{x_pos}+{y_pos}")
 
 # 그리드 행 구성
-for i in range(5):
-    root.grid_rowconfigure(i, weight=1, minsize=window_height//5)
+for i in range(3):
+    root.grid_rowconfigure(i, weight=1, minsize=window_height//3)
 
 # 그리드 열 구성
 for i in range(2):
@@ -75,13 +84,15 @@ word_label2.grid(row=1, column=0, pady=5, sticky="e")
 word_entry2 = tk.Entry(root)
 word_entry2.grid(row=1, column=1, pady=5, sticky="w")
 
-remove_file_button = tk.Button(root, text="파일 삭제", command=remove_files)
-remove_file_button.grid(row=2, column=0, columnspan=2, ipady=5)
+menubutton = tk.Menubutton(root, text="기능",relief="raised")
+menubutton.grid(row=2, column=0, columnspan=2, ipady=5)
 
-remove_string_button = tk.Button(root, text="파일명에서 문자 제거", command=remove_string_from_filename)
-remove_string_button.grid(row=3, column=0, columnspan=2,ipady=5)
+topMenu = tk.Menu(menubutton, tearoff=0)
+menubutton.configure(menu=topMenu)
 
-change_string_button = tk.Button(root, text="파일명에서 문자 변경", command=change_string_from_filename)
-change_string_button.grid(row=4, column=0, columnspan=2, ipady=5)
+topMenu.add_command(label="파일 삭제", command=remove_files)
+topMenu.add_command(label="파일명에서 문자 제거", command=remove_string_from_filename)
+topMenu.add_command(label="파일명에서 문자 변경", command=change_string_from_filename)
+topMenu.add_command(label="파일명 및 폴더명 대문자로", command=makeupper)
 
 root.mainloop()
