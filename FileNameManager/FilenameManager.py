@@ -1,4 +1,6 @@
 ﻿import os
+import re
+import shutil
 
 class FilenameManager:
     def __init__(self):
@@ -68,3 +70,49 @@ class FilenameManager:
                 old_path = os.path.join(root, name)
                 new_path = os.path.join(root, name.upper())
                 os.rename(old_path, new_path)
+
+    @staticmethod
+    def rename_files_with_seven_digits(folder_path, word_to_add):
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                match = re.search(r'\b\d{7}\b', file)
+                if match:
+                    seven_digits = match.group()
+                    base_new_name = f"{word_to_add}{seven_digits}"
+                    extension = os.path.splitext(file)[1]
+                
+                    # 새 파일 이름 생성 (중복 방지)
+                    counter = 0
+                    while True:
+                        if counter == 0:
+                            new_file_name = f"{base_new_name}{extension}"
+                        else:
+                            new_file_name = f"{base_new_name}_{counter}{extension}"
+                    
+                        new_path = os.path.join(root, new_file_name)
+                        if not os.path.exists(new_path):
+                            break
+                        counter += 1
+                
+                    # 파일 이름 변경
+                    old_path = os.path.join(root, file)
+                    os.rename(old_path, new_path)
+
+    @staticmethod
+    def move_and_cleanup_files(folder_path):
+        for root, dirs, files in os.walk(folder_path, topdown=False):
+            # Skip the base path itself
+            if root == folder_path:
+                continue
+        
+            # Check if this is a folder with only one file and no subdirectories
+            if len(files) == 1 and not dirs:
+                single_file_path = os.path.join(root, files[0])
+                parent_dir = os.path.dirname(root)
+                new_file_path = os.path.join(parent_dir, files[0])
+            
+                # Move the file to the parent directory
+                shutil.move(single_file_path, new_file_path)
+            
+                # Remove the now empty directory
+                os.rmdir(root) 

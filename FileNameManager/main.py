@@ -52,6 +52,22 @@ def makeupper():
 
     # 작업 완료 알림 창 표시
     show_done_window("파일명 및 폴더명 변경 완료")
+
+def makereg():
+    folder_path = filedialog.askdirectory()
+    word_to_add = word_entry2.get()
+
+    FilenameManager.rename_files_with_seven_digits(folder_path, word_to_add)
+
+    # 작업 완료 알림 창 표시
+    show_done_window("파일명 변경 완료")
+
+def filemoveandclean():
+    folder_path = filedialog.askdirectory()
+    FilenameManager.move_and_cleanup_files(folder_path)
+
+    # 작업 완료 알림 창 표시
+    show_done_window("파일 정리 완료")
     
 root = tk.Tk()
 root.title("파일 관리기")
@@ -94,5 +110,7 @@ topMenu.add_command(label="파일 삭제", command=remove_files)
 topMenu.add_command(label="파일명에서 문자 제거", command=remove_string_from_filename)
 topMenu.add_command(label="파일명에서 문자 변경", command=change_string_from_filename)
 topMenu.add_command(label="파일명 및 폴더명 대문자로", command=makeupper)
+topMenu.add_command(label="파일명 정규화", command=makereg)
+topMenu.add_command(label="파일 리스트 정리",command=filemoveandclean)
 
 root.mainloop()
