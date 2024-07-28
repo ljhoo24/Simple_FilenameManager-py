@@ -124,8 +124,4 @@ class FilenameManager:
             for file in files:
                 if any(file.endswith(ext) for ext in extensions):
                     file_path = os.path.join(root, file)
-                    try:
-                        os.remove(file_path)
-                        print(f"Removed file: {file_path}")
-                    except Exception as e:
-                        print(f"Error removing file {file_path}: {e}")
+                    os.remove(file_path)
