@@ -68,6 +68,13 @@ def filemoveandclean():
 
     # 작업 완료 알림 창 표시
     show_done_window("파일 정리 완료")
+
+def removeuselessfile():
+    folder_path = filedialog.askdirectory()
+    FilenameManager.remove_files_by_extension(folder_path)
+
+    # 작업 완료 알림 창 표시
+    show_done_window("파일 제거 완료")
     
 root = tk.Tk()
 root.title("파일 관리기")
@@ -112,5 +119,6 @@ topMenu.add_command(label="파일명에서 문자 변경", command=change_string
 topMenu.add_command(label="파일명 및 폴더명 대문자로", command=makeupper)
 topMenu.add_command(label="파일명 정규화", command=makereg)
 topMenu.add_command(label="파일 리스트 정리",command=filemoveandclean)
+topMenu.add_command(label="쓰레기 파일 정리",command=removeuselessfile)
 
 root.mainloop()

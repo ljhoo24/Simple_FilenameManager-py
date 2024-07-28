@@ -116,3 +116,16 @@ class FilenameManager:
             
                 # Remove the now empty directory
                 os.rmdir(root) 
+
+    @staticmethod
+    def remove_files_by_extension(folder_path):
+        extensions = ['.txt', '.url']
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if any(file.endswith(ext) for ext in extensions):
+                    file_path = os.path.join(root, file)
+                    try:
+                        os.remove(file_path)
+                        print(f"Removed file: {file_path}")
+                    except Exception as e:
+                        print(f"Error removing file {file_path}: {e}")
