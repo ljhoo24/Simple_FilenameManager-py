@@ -26,6 +26,7 @@ class FilenameManager:
                     dir_path = os.path.join(root, dir)
                     new_dir_name = dir.replace(word_to_remove, "")
                     if new_dir_name != dir:
+                        
                         new_dir_path = os.path.join(root, new_dir_name)
                         os.rename(dir_path, new_dir_path)
 
