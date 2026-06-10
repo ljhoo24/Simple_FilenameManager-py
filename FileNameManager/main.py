@@ -42,6 +42,11 @@ OPERATIONS = {
         "plan": lambda folder, v: FilenameManager.plan_remove_by_extension(folder),
         "destructive": True,
     },
+    "지정 크기 미만 파일 삭제": {
+        "fields": [("기준 크기 (KB)", "size_kb", True)],
+        "plan": lambda folder, v: FilenameManager.plan_remove_small_files(folder, v["size_kb"]),
+        "destructive": True,
+    },
 }
 
 ACTION_LABELS = {

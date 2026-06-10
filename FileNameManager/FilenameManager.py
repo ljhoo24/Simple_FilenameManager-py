@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import stat
 
 
 class FilenameManager:
@@ -40,6 +41,28 @@ class FilenameManager:
             for name in files:
                 if name.lower().endswith(extensions):
                     changes.append({"type": "delete", "src": os.path.join(root, name)})
+        return changes
+
+    @staticmethod
+    def plan_remove_small_files(folder_path, size_kb):
+        """지정 크기(KB) 미만 파일 전체 삭제 계획."""
+        changes = []
+        if not folder_path:
+            return changes
+        try:
+            limit = float(size_kb) * 1024
+        except (TypeError, ValueError):
+            return changes
+        if limit <= 0:
+            return changes
+        for root, _dirs, files in os.walk(folder_path):
+            for name in files:
+                path = os.path.join(root, name)
+                try:
+                    if os.path.getsize(path) < limit:
+                        changes.append({"type": "delete", "src": path})
+                except OSError:
+                    pass
         return changes
 
     @staticmethod
@@ -121,7 +144,12 @@ class FilenameManager:
             try:
                 kind = change["type"]
                 if kind == "delete":
-                    os.remove(change["src"])
+                    try:
+                        os.remove(change["src"])
+                    except PermissionError:
+                        # 읽기 전용 파일이면 속성 해제 후 재시도
+                        os.chmod(change["src"], stat.S_IWRITE)
+                        os.remove(change["src"])
                 elif kind == "rename":
                     os.rename(change["src"], change["dst"])
                 elif kind == "move":
