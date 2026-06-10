@@ -47,6 +47,12 @@ OPERATIONS = {
         "plan": lambda folder, v: FilenameManager.plan_remove_small_files(folder, v["size_kb"]),
         "destructive": True,
     },
+    "모든 파일을 한 폴더로 모으기": {
+        "fields": [],
+        "needs_dest": True,
+        "plan": lambda folder, v: FilenameManager.plan_collect_files(folder, v["dest"]),
+        "destructive": False,
+    },
 }
 
 ACTION_LABELS = {
@@ -61,6 +67,7 @@ class App:
     def __init__(self, root):
         self.root = root
         self.folder = tk.StringVar()
+        self.dest_folder = tk.StringVar()
         self.operation = tk.StringVar(value=next(iter(OPERATIONS)))
         self.field_vars = {}
         self.plan = []
@@ -144,6 +151,12 @@ class App:
         scrollbar.grid(row=0, column=1, sticky="ns")
         self.tree.configure(yscrollcommand=scrollbar.set)
 
+    @staticmethod
+    def _display_path(path, base):
+        """대상 폴더 안이면 상대 경로, 밖(출력 폴더 등)이면 전체 경로로 표시."""
+        rel = os.path.relpath(path, base)
+        return path if rel.startswith("..") else rel
+
     def _center_window(self, width, height):
         screen_w = self.root.winfo_screenwidth()
         screen_h = self.root.winfo_screenheight()
@@ -156,8 +169,8 @@ class App:
             child.destroy()
         self.field_vars = {}
 
-        fields = OPERATIONS[self.operation.get()]["fields"]
-        for i, (label, key, _required) in enumerate(fields):
+        op = OPERATIONS[self.operation.get()]
+        for i, (label, key, _required) in enumerate(op["fields"]):
             ttk.Label(self.fields_frame, text=label).grid(
                 row=i, column=0, sticky="w", padx=(0, 8), pady=(4, 0)
             )
@@ -168,6 +181,20 @@ class App:
             )
             self.field_vars[key] = var
 
+        # 출력 폴더가 필요한 작업이면 선택 행 추가
+        self.dest_folder.set("")
+        if op.get("needs_dest"):
+            row = len(op["fields"])
+            ttk.Label(self.fields_frame, text="출력 폴더").grid(
+                row=row, column=0, sticky="w", padx=(0, 8), pady=(4, 0)
+            )
+            ttk.Entry(
+                self.fields_frame, textvariable=self.dest_folder, state="readonly"
+            ).grid(row=row, column=1, sticky="ew", pady=(4, 0))
+            ttk.Button(
+                self.fields_frame, text="찾아보기…", command=self._browse_dest
+            ).grid(row=row, column=2, padx=(8, 0), pady=(4, 0))
+
         self._invalidate_plan()
 
     # ---------- 동작 ----------
@@ -176,6 +203,12 @@ class App:
         path = filedialog.askdirectory(title="대상 폴더 선택")
         if path:
             self.folder.set(os.path.normpath(path))
+            self._invalidate_plan()
+
+    def _browse_dest(self):
+        path = filedialog.askdirectory(title="출력 폴더 선택")
+        if path:
+            self.dest_folder.set(os.path.normpath(path))
             self._invalidate_plan()
 
     def _invalidate_plan(self):
@@ -197,6 +230,12 @@ class App:
             if required and not values[key]:
                 messagebox.showwarning("입력 필요", f"'{label}' 값을 입력하세요.")
                 return None, None
+        if op.get("needs_dest"):
+            dest = self.dest_folder.get()
+            if not dest or not os.path.isdir(dest):
+                messagebox.showwarning("폴더 없음", "출력 폴더를 선택하세요.")
+                return None, None
+            values["dest"] = dest
         return folder, values
 
     def _preview(self):
@@ -211,8 +250,8 @@ class App:
             self.tree.delete(item)
 
         for change in self.plan:
-            src = os.path.relpath(change["src"], folder)
-            dst = os.path.relpath(change["dst"], folder) if "dst" in change else ""
+            src = self._display_path(change["src"], folder)
+            dst = self._display_path(change["dst"], folder) if "dst" in change else ""
             self.tree.insert(
                 "", "end", values=(ACTION_LABELS[change["type"]], src, dst)
             )

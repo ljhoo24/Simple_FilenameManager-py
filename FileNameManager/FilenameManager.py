@@ -133,6 +133,25 @@ class FilenameManager:
                 changes.append({"type": "rmdir", "src": root})
         return changes
 
+    @staticmethod
+    def plan_collect_files(folder_path, dest_folder):
+        """입력 폴더를 재귀 탐색해 모든 파일을 출력 폴더 한곳으로 모으는 계획."""
+        changes = []
+        if not folder_path or not dest_folder:
+            return changes
+        dest_norm = os.path.normcase(os.path.abspath(dest_folder))
+        taken = set()
+        for root, _dirs, files in os.walk(folder_path):
+            # 이미 출력 폴더 바로 안에 있는 파일은 옮길 필요 없음
+            if os.path.normcase(os.path.abspath(root)) == dest_norm:
+                continue
+            for name in files:
+                src = os.path.join(root, name)
+                dst = FilenameManager._avoid_collision(os.path.join(dest_folder, name), taken)
+                taken.add(os.path.normcase(dst))
+                changes.append({"type": "move", "src": src, "dst": dst})
+        return changes
+
     # ---------- 적용(apply) ----------
 
     @staticmethod
