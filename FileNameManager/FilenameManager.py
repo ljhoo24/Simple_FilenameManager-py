@@ -135,7 +135,8 @@ class FilenameManager:
 
     @staticmethod
     def plan_collect_files(folder_path, dest_folder):
-        """입력 폴더를 재귀 탐색해 모든 파일을 출력 폴더 한곳으로 모으는 계획."""
+        """입력 폴더를 재귀 탐색해 모든 파일을 출력 폴더 한곳으로 모으고,
+        비게 된 하위 폴더를 삭제하는 계획."""
         changes = []
         if not folder_path or not dest_folder:
             return changes
@@ -150,6 +151,17 @@ class FilenameManager:
                 dst = FilenameManager._avoid_collision(os.path.join(dest_folder, name), taken)
                 taken.add(os.path.normcase(dst))
                 changes.append({"type": "move", "src": src, "dst": dst})
+        moved = {os.path.normcase(os.path.abspath(c["src"])) for c in changes}
+        FilenameManager._plan_removable_dirs(folder_path, moved, dest_norm, changes)
+        return changes
+
+    @staticmethod
+    def plan_remove_empty_dirs(folder_path):
+        """빈 하위 폴더 전체 삭제 계획 (빈 폴더만 담고 있는 폴더 포함)."""
+        changes = []
+        if not folder_path:
+            return changes
+        FilenameManager._plan_removable_dirs(folder_path, frozenset(), None, changes)
         return changes
 
     # ---------- 적용(apply) ----------
@@ -195,6 +207,35 @@ class FilenameManager:
             dst = FilenameManager._avoid_collision(dst, taken)
         taken.add(os.path.normcase(dst))
         changes.append({"type": "rename", "src": src, "dst": dst})
+
+    @staticmethod
+    def _plan_removable_dirs(folder_path, moved, protect_norm, changes):
+        """이동(moved) 적용 후 비게 되는 하위 폴더의 rmdir 계획을 changes에 추가.
+
+        protect_norm(출력 폴더)과 그 상위 폴더는 보존한다.
+        bottom-up 순회라 깊은 폴더가 먼저 삭제된다.
+        """
+        base_norm = os.path.normcase(os.path.abspath(folder_path))
+        removable = set()
+        for root, dirs, files in os.walk(folder_path, topdown=False):
+            norm = os.path.normcase(os.path.abspath(root))
+            if norm == base_norm:
+                continue
+            if protect_norm and (
+                norm == protect_norm or protect_norm.startswith(norm + os.sep)
+            ):
+                continue
+            files_gone = all(
+                os.path.normcase(os.path.abspath(os.path.join(root, f))) in moved
+                for f in files
+            )
+            dirs_gone = all(
+                os.path.normcase(os.path.abspath(os.path.join(root, d))) in removable
+                for d in dirs
+            )
+            if files_gone and dirs_gone:
+                removable.add(norm)
+                changes.append({"type": "rmdir", "src": root})
 
     @staticmethod
     def _avoid_collision(dst, taken):

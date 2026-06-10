@@ -53,6 +53,11 @@ OPERATIONS = {
         "plan": lambda folder, v: FilenameManager.plan_collect_files(folder, v["dest"]),
         "destructive": False,
     },
+    "빈 폴더 삭제": {
+        "fields": [],
+        "plan": lambda folder, v: FilenameManager.plan_remove_empty_dirs(folder),
+        "destructive": False,
+    },
 }
 
 ACTION_LABELS = {
